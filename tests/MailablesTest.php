@@ -148,7 +148,7 @@ class MailablesTest extends TestCase
     }
 
     #[Test]
-    public function details_show_an_arrayable_objects_contents_and_any_other_objects_class()
+    public function details_show_a_collections_contents_and_any_other_objects_class()
     {
         $constructor = collect(Mailables::describe(ExampleMail::class)['details']['constructor'])->keyBy('name');
 
@@ -212,6 +212,16 @@ class MailablesTest extends TestCase
         $scalar = collect(Mailables::describe(ScalarMail::class)['details']['constructor'])->keyBy('name');
 
         $this->assertNull($scalar['name']['options']);
+    }
+
+    #[Test]
+    public function a_mailables_preview_examples_are_asked_once()
+    {
+        ExampleMail::$asked = 0;
+
+        Mailables::describe(ExampleMail::class);
+
+        $this->assertSame(1, ExampleMail::$asked);
     }
 
     #[Test]

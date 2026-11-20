@@ -129,7 +129,6 @@ class MailableInspector
                 $type = $this->namedTypeName($parameter->getType());
                 $input = $this->inputFor($parameter);
                 $value = $mailable->{$name} ?? null;
-                $enum = (new MailableFactory)->enumType($parameter);
 
                 return [
                     'name' => $name,
@@ -139,7 +138,7 @@ class MailableInspector
                     'input' => $input,
                     'editable' => $input !== null,
                     'example' => array_key_exists($name, $examples),
-                    'options' => $enum ? $this->enumOptions($enum) : null,
+                    'options' => $type && enum_exists($type) ? $this->enumOptions($type) : null,
                     'nullable' => $parameter->allowsNull(),
                 ];
             })

@@ -138,7 +138,7 @@ class MailableInspector
                     'input' => $input,
                     'editable' => $input !== null,
                     'example' => array_key_exists($name, $examples),
-                    'options' => $type && enum_exists($type) ? $this->enumOptions($type) : null,
+                    'options' => $input === 'select' ? $this->enumOptions($type) : null,
                     'nullable' => $parameter->allowsNull(),
                 ];
             })
@@ -147,7 +147,7 @@ class MailableInspector
 
     /**
      * An enum's cases as the options of a select: valued by case name, labelled by it too,
-     * a backed case with its value after it ("Mr (0)").
+     * a backed case with its value after it ("Formal (formal)").
      *
      * @param  class-string<\UnitEnum>  $enum
      * @return array<int, array{label: string, value: string}>

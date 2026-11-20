@@ -140,7 +140,7 @@ function cloneInjected(mailable) {
 }
 
 function isExample(param) {
-    return param.example && param.value === param.initial;
+    return param.example && String(param.value) === String(param.initial);
 }
 
 function cloneEnvelope(mailable) {

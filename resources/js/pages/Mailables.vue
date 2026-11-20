@@ -48,7 +48,7 @@ const injectedValues = computed(() => {
     return Object.fromEntries(
         injected.value
             .filter((param) => param.editable)
-            .map((param) => [param.name, param.value]),
+            .map((param) => [param.name, param.input === 'select' ? (param.value ?? '') : param.value]),
     );
 });
 
@@ -421,6 +421,13 @@ watch(injectedValues, () => {
                                                 <Switch
                                                     v-if="param.editable && param.input === 'checkbox'"
                                                     v-model="param.value"
+                                                    size="sm"
+                                                />
+                                                <Select
+                                                    v-else-if="param.editable && param.input === 'select'"
+                                                    v-model="param.value"
+                                                    :options="param.options"
+                                                    :clearable="param.nullable"
                                                     size="sm"
                                                 />
                                                 <Input

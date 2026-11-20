@@ -45,7 +45,20 @@ class MailableFactory
     protected function resolveParameter(ReflectionParameter $parameter, array $overrides = [], array $examples = []): mixed
     {
         if (array_key_exists($parameter->getName(), $overrides) && $this->isOverridable($parameter)) {
-            return $this->castOverride($parameter, $overrides[$parameter->getName()]);
+            $override = $overrides[$parameter->getName()];
+            $enum = $this->enumType($parameter);
+
+            if (! $enum) {
+                return $this->castOverride($parameter, $override);
+            }
+
+            if ($case = $this->enumCase($enum, $override)) {
+                return $case;
+            }
+
+            if (($override === '' || $override === null) && $parameter->allowsNull()) {
+                return null;
+            }
         }
 
         if (array_key_exists($parameter->getName(), $examples)) {
@@ -203,7 +216,36 @@ class MailableFactory
         }
 
         return in_array($type, ['int', 'integer', 'float', 'double', 'bool', 'boolean', 'string'], true)
-            || is_a($type, DateTimeInterface::class, true);
+            || is_a($type, DateTimeInterface::class, true)
+            || enum_exists($type);
+    }
+
+    /**
+     * The enum a parameter is typed as, if it is one.
+     *
+     * @return class-string<\UnitEnum>|null
+     */
+    public function enumType(ReflectionParameter $parameter): ?string
+    {
+        $type = $this->namedTypeName($parameter->getType());
+
+        return $type && enum_exists($type) ? $type : null;
+    }
+
+    /**
+     * The case of an enum by its name, which backed and pure enums both have.
+     *
+     * @param  class-string<\UnitEnum>  $enum
+     */
+    protected function enumCase(string $enum, mixed $name): ?\UnitEnum
+    {
+        foreach ($enum::cases() as $case) {
+            if ($case->name === $name) {
+                return $case;
+            }
+        }
+
+        return null;
     }
 
     protected function namedTypeName(?ReflectionType $type): ?string
